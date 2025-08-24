@@ -14,5 +14,9 @@
 .DS_Store
 
 #Dir struture with data 
-
+/010-reference/logs/
+/010-reference/data/
+/010-reference/results/
+/010-reference/star_index/
+/010-reference/salmon_index/
 

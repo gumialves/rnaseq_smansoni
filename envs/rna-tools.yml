@@ -4,6 +4,8 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - star
+  - salmon
   - python=3.10
   - fastqc=0.12.1
   - fastp=0.23.4
