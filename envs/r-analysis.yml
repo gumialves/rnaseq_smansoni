@@ -12,3 +12,9 @@ dependencies:
   - bioconductor-isoformswitchanalyzer
   - r-heatmaply
   - r-pheatmap
+  - r-ggplot2
+  - r-ggrepel
+  - r-rcolorbrewer
+  - bioconductor-reportingtools
+  - bioconductor-rtracklayer
+  - bioconductor-clusterprofiler
