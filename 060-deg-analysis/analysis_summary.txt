@@ -1,0 +1,15 @@
+Análise de Expressão Diferencial - Schistosoma mansoni
+=====================================================
+
+Data da análise:  2025-09-22 11:14:13 
+
+Estatísticas gerais:
+- Total de genes na matriz:  9914 
+- Genes após filtragem (rowSums>10):  9786 
+- Genes diferencialmente expressos (padj<0.05 & |log2FC|>1):  1811 
+
+Arquivos gerados:
+- Resultados DEG anotados: DEGs_annotated_results.tsv
+- Counts normalizados: normalized_counts.tsv
+- Objeto DESeq2: dds_object.rds
+- Visualizações: PCA_plot.png, heatmap_top100.png, volcano_plot.png, MA_plot.png

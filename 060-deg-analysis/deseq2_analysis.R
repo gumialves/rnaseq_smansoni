@@ -13,11 +13,21 @@ suppressPackageStartupMessages({
 # ================================
 # CONFIGURAÇÕES
 # ================================
-project_dir <- "../"
+project_dir <- Sys.getenv("PROJECT_DIR")
 counts_file <- file.path(project_dir, "050-quantification", "counts_matrix.tsv")
 meta_file   <- file.path(project_dir, "010-reference", "RNAseq_metadata.tsv")
-gff_file    <- file.path(project_dir, "010-reference/data/schistosoma_mansoni.PRJEA36577.WBPS19.annotations.gff3")
+gff_file    <- Sys.getenv("REF_GFF3") # Usar a variável de ambiente REF_GFF3
 out_dir     <- file.path(project_dir, "060-deg-analysis")
+
+# ================================
+# VERIFICAÇÃO DE VARIÁVEIS DE AMBIENTE
+# ================================
+if (project_dir == "") {
+  stop("[ERRO] Variável de ambiente PROJECT_DIR não definida. Certifique-se de carregar pipeline_config.sh antes de executar este script.")
+}
+if (gff_file == "") {
+  stop("[ERRO] Variável de ambiente REF_GFF3 não definida. Certifique-se de carregar pipeline_config.sh antes de executar este script.")
+}
 
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -29,8 +39,8 @@ log_info <- function(msg) cat(format(Sys.time(), "[%Y-%m-%d %H:%M:%S]"), msg, "\
 # ================================
 # VERIFICAÇÃO DE ARQUIVOS
 # ================================
-if (!file.exists(counts_file)) stop("Counts matrix não encontrada!")
-if (!file.exists(meta_file)) stop("Metadata não encontrada!")
+if (!file.exists(counts_file)) stop(paste0("Counts matrix não encontrada em: ", counts_file))
+if (!file.exists(meta_file)) stop(paste0("Metadata não encontrada em: ", meta_file))
 
 # ================================
 # LEITURA DE DADOS
@@ -57,7 +67,7 @@ if(zero_genes > 0) log_info(paste(zero_genes, "genes com contagem zero em todas 
 # ================================
 process_gff3 <- function(gff_file, counts_genes) {
   if(!file.exists(gff_file)) {
-    warning("Arquivo GFF3 não encontrado, usando apenas IDs de gene")
+    warning(paste0("Arquivo GFF3 não encontrado em ", gff_file, ", usando apenas IDs de gene"))
     return(data.frame(
       gene_id = counts_genes,
       gene_name = counts_genes,
@@ -67,39 +77,19 @@ process_gff3 <- function(gff_file, counts_genes) {
   }
   
   log_info("Lendo arquivo de anotações GFF3...")
-  gff <- import(gff_file)
+  gff <- rtracklayer::import(gff_file)
   genes <- gff[gff$type == "gene"]
   
-  # Garantir que attributes seja character
-  attributes_char <- as.character(mcols(genes)$attributes)
+  # Extrair atributos de forma mais robusta
+  gene_id_raw   <- genes$ID
+  gene_name_raw <- genes$Name
+  biotype_raw   <- genes$biotype
   
-  get_attr <- function(attr_string, key) {
-    sapply(attr_string, function(x) {
-      if(is.na(x) || x=="") return(NA)
-      kv_pairs <- strsplit(x, ";")[[1]]
-      kv_list <- strsplit(kv_pairs, "=")
-      kv_list <- kv_list[sapply(kv_list, length)==2]
-      val <- kv_list[sapply(kv_list, `[`, 1) == key]
-      if(length(val)==0) return(NA)
-      kv_list[[which(sapply(kv_list, `[`, 1) == key)]][2]
-    }, USE.NAMES = FALSE)
-  }
-  
-  gene_id   <- get_attr(attributes_char, "ID")
-  gene_name <- get_attr(attributes_char, "Name")
-  biotype   <- get_attr(attributes_char, "biotype")
-  
-  n <- length(counts_genes)
-  
-  # Fallback seguro: se não há valores do GFF3, preencher com counts_genes
-  if(length(gene_id) == 0)   gene_id   <- counts_genes
-  if(length(gene_name) == 0) gene_name <- gene_id
-  if(length(biotype) == 0)   biotype   <- rep("Unknown", length(gene_id))
-  
-  # Garantir que todos têm mesmo tamanho
-  gene_id   <- rep_len(gene_id, n)
-  gene_name <- rep_len(gene_name, n)
-  biotype   <- rep_len(biotype, n)
+  # Limpeza e padronização dos IDs e nomes
+  gene_id   <- gsub("^gene:", "", gene_id_raw)
+  gene_id   <- gsub("\\.[0-9]+$", "", gene_id)
+  gene_name <- ifelse(is.null(gene_name_raw) | is.na(gene_name_raw), gene_id, gene_name_raw)
+  biotype   <- ifelse(is.null(biotype_raw) | is.na(biotype_raw), "Unknown", biotype_raw)
   
   annotations <- data.frame(
     gene_id = gene_id,
@@ -108,6 +98,10 @@ process_gff3 <- function(gff_file, counts_genes) {
     stringsAsFactors = FALSE
   )
   annotations <- annotations[!duplicated(annotations$gene_id), ]
+  
+  # Filtrar anotações para incluir apenas genes presentes nas contagens
+  annotations <- annotations %>% filter(gene_id %in% counts_genes)
+  
   return(annotations)
 }
 
@@ -242,3 +236,4 @@ cat("- Objeto DESeq2: dds_object.rds\n")
 cat("- Visualizações: PCA_plot.png, heatmap_top100.png, volcano_plot.png, MA_plot.png\n")
 sink()
 log_info(paste("[OK] Análise DEG concluída. Resultados em", out_dir))
+
