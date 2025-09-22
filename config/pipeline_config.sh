@@ -3,8 +3,7 @@
 # pipeline_config.sh - Configurações centrais para o pipeline de RNA-seq de S. mansoni
 
 # Diretório base do projeto
-export PROJECT_DIR="$(dirname "$(dirname "$(readlink -f "$0")")")"
-
+export PROJECT_DIR="$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")"
 # Diretórios principais
 export REF_DIR="${PROJECT_DIR}/010-reference"
 export DATA_DIR="${REF_DIR}/data"
