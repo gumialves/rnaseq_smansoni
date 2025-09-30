@@ -19,7 +19,7 @@ O pipeline é organizado em módulos sequenciais, cada um responsável por uma e
 - `020-data-download/`: Download dos arquivos FASTQ do European Nucleotide Archive (ENA).
 - `030-qc-fastq/`: Controle de qualidade (QC) e trimming dos dados FASTQ.
 - `040-alignment/`: Etapa de alinhamento das leituras ao genoma de referência.
-- `050-quantification/`: Quantificação da expressão gênica (e.g., Salmon/kallisto).
+- `050-quantification/`: Quantificação da expressão gênica.
 - `060-deg-analysis/`: Análise de Expressão Gênica Diferencial (DEG) utilizando DESeq2.
 - `070-dtu-analysis/`: (Opcional) Análise de Uso Diferencial de Transcritos (DTU) e isoformas.
 - `080-splicing/`: (Opcional) Análise de splicing alternativo.
