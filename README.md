@@ -37,3 +37,4 @@ O pipeline é organizado em módulos sequenciais, cada um responsável por uma e
 
 ## Referências
 
+BUDDENBORG, Sarah K. et al. The stage-and sex-specific transcriptome of the human parasite Schistosoma mansoni. Scientific Data, [S.L.], v. 10, n. 1, p. e00116714, 7 nov. 2023. Springer Science and Business Media LLC. http://dx.doi.org/10.1038/s41597-023-02674-2. 
