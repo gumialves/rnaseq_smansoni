@@ -10,7 +10,7 @@ for folder in os.listdir(base_dir):
     
     # Checa se é um diretório do tipo Smp_xxxx
     if os.path.isdir(folder_path) and folder.startswith("Smp_"):
-        full_report_path = os.path.join(folder_path, "full_report.txt")
+        full_report_path = os.path.join(folder_path, "annotation_report.txt")
         
         if os.path.isfile(full_report_path):
             with open(full_report_path, "r", encoding="utf-8") as f:
