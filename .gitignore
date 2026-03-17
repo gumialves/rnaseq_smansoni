@@ -12,6 +12,7 @@
 .Rhistory
 .RData
 .DS_Store
+run_*
 
 #Dir struture with data 
 logs/
